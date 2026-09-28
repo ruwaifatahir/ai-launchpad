@@ -1,0 +1,102 @@
+/// The creator's written agreement to the list of automated actions their agent
+/// will take. X requires that agreement before an app acts through an account,
+/// and authorizing at X does not stand in for it, so this row is written before
+/// the creator is ever sent to X.
+///
+/// Append only. Nothing updates a row and nothing deletes one, so agreeing again
+/// writes a second row and the gate is a read of the latest. That is what keeps
+/// "who authorized this account, and to what" answerable after the connection
+/// itself is gone, because an agent's posts stay on X after a disconnect.
+model Consent {
+  /// Row identity, because one token holds many of these. A version 7 UUID, which
+  /// is ordered by creation time, so new rows append to the index rather than
+  /// landing at random through it.
+  id String @id @default(uuid(7))
+
+  /// The token whose agent was agreed to, always lowercased, as the agents table
+  /// already is. Indexed and never unique: many rows for one token is the point.
+  token String
+
+  /// The wallet that agreed. The creator is recorded on chain and never changes,
+  /// so this is where "who agreed" belongs rather than on the connection.
+  wallet String
+
+  /// Which text was agreed to. A version's text is never edited: a change is a new
+  /// version and git holds the history, so this number is a faithful pointer and
+  /// AI Launchpad stores no copy of the text.
+  ///
+  /// Only a material change bumps the version. A bump silences every agent until
+  /// each creator returns and agrees again, and a wording fix is not worth that.
+  version Int
+
+  /// When they agreed. There is no updatedAt, because nothing updates.
+  agreedAt DateTime @default(now())
+
+  /// Serves the read of a token's latest consent, which orders by agreedAt
+  /// descending.
+  @@index([token, agreedAt])
+  @@map("consents")
+}
+
+/// The link between one agent and one X account the creator already owns. One row
+/// per token, written when the creator returns from X, and the only place AI Launchpad
+/// holds the credentials that publish as them.
+///
+/// The absence of a row is what Disconnected means. Nothing here is reconciled
+/// against the agent model, so a disconnect leaves the persona, the topics, the
+/// pace, the pause and the admin stop exactly as they were.
+///
+/// A row with credentials and no attestation is a real and reachable state, and it
+/// publishes nothing.
+model Connection {
+  /// The token whose agent posts from this account, always lowercased, as the
+  /// agents table already is. One connection per agent, so the token is the key
+  /// and a client needs no second identifier to reach it.
+  token String @id
+
+  /// The account's permanent identifier at X. Unique across the table, which is
+  /// the rule refusing an X account already connected to another token. The handle
+  /// is not the rule: a creator may rename the account at X and it is still the
+  /// same account.
+  xUserId String @unique
+
+  /// The handle as it was at the moment the account connected, for display. Never
+  /// refreshed, because a read needs a live access credential, every read is
+  /// billed, and renewal is the one operation here that can lose the connection.
+  /// A creator who renames on X sees the old handle until they connect again.
+  xUsername String
+
+  /// The two credentials X issued, each sealed by src/lib/encryption/cipher.ts and
+  /// never written in plaintext. The threat is a leaked dump or a stray database
+  /// session, and the refresh credential is the whole connection: whoever holds one
+  /// publishes as the creator until the creator revokes it.
+  ///
+  /// Rotating ENCRYPTION_KEY disconnects every agent, because nothing sealed under
+  /// the old key opens under the new one.
+  accessCredential  String
+  refreshCredential String
+
+  /// When the access credential dies. Stored so a caller renews ahead of a post
+  /// rather than after a failure. X gives no overlap window, so a renewal spends
+  /// both halves of the pair at once.
+  ///
+  /// A renewal writes the new pair here before the new credential reaches any
+  /// caller, so nothing publishes with a credential this row does not hold. The
+  /// gap between X issuing that pair and this row holding it stays open, and a
+  /// crash inside it costs the creator a reconnection.
+  accessExpiresAt DateTime
+
+  /// The creator's word that they turned on X's automated label and linked a human
+  /// account from the bio. Null until they say so, and the agent publishes nothing
+  /// while it is null. No API sets either step and no API reads either one back, so
+  /// AI Launchpad can neither do it nor check it.
+  ///
+  /// Cleared when a creator connects again, because their word was about the
+  /// account that was connected then.
+  confirmedAt DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("connections")
+}

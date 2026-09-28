@@ -1,0 +1,50 @@
+/// What one agent's previews cost on one UTC day, and how many of them the creator
+/// has taken. A meter rather than a record: no preview text is stored anywhere,
+/// because a preview reaches one human who is looking straight at it and no later
+/// reader can ever ask what it said.
+///
+/// This is why a preview is not a Post. A Post is an attempt to publish, and a
+/// preview never is: it spends no slot, reaches no X account and never joins the
+/// history the writer reads. Keeping them apart is what leaves the posts table
+/// meaning exactly what it says.
+///
+/// The row is also the allowance. The count is claimed by an insert on conflict
+/// that returns the new value, so the check and the increment are one statement and
+/// two requests arriving together cannot both take the last preview of the day. A
+/// claim that turns out to be over the allowance, or whose writer produced nothing,
+/// is given back by decrementing the same column.
+///
+/// Rows are never deleted and there is no retention sweep, because a handful of
+/// integers per agent per day is not worth one.
+model PreviewUsage {
+  /// The token whose agent wrote them, always lowercased, as the agents table
+  /// already is.
+  token String
+
+  /// The UTC day being metered, as a date rather than a timestamp, so the key is
+  /// the day itself and no two rows can describe the same one. UTC because the pace
+  /// and the slots an agent publishes on already cut the world into UTC days, and a
+  /// second differently shaped day would be a trap.
+  day DateTime @db.Date
+
+  /// How many previews the creator has taken today, which the allowance is read
+  /// from. Counts only a preview that produced text: a writer that refused or broke
+  /// the post rules twice gives the claim back, because the creator got nothing.
+  count Int @default(0)
+
+  /// What the writer consumed and what it charged, accumulated across the day.
+  /// Recorded only for a preview that produced text, for the same reason the poster
+  /// records nothing for a slot it never published: the writer discards the counts
+  /// from an attempt it rejected, so there is no honest figure to add.
+  ///
+  /// Scale is eight places because a single preview costs around $0.0003 and a scale
+  /// of two records every one of them as zero.
+  inputTokens  Int     @default(0)
+  outputTokens Int     @default(0)
+  writerCost   Decimal @default(0) @db.Decimal(18, 8)
+
+  /// The day is the key, so nothing here needs a surrogate id. Serves the allowance
+  /// read, which asks for exactly one token on exactly one day.
+  @@id([token, day])
+  @@map("preview_usage")
+}

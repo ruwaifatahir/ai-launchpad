@@ -1,0 +1,138 @@
+/*
+ * Launchpad pieces the shared terminal look (app/styles/terminal-shell.css) does not cover: the
+ * toolbar, the filters and the search dialog.
+ */
+
+/* Same cascade layer as the global design CSS, so Tailwind utilities still win. */
+@layer components {
+  /* Toolbar and filters lose their pills */
+  .launchpad-explore-shell :is(.launch-explore-search, .launch-explore-create-btn, .launch-explore-kbd) {
+    border-radius: 2px;
+  }
+  .launchpad-explore-shell :is(.tabs-list, .tabs-indicator, .tabs-tab, .launch-explore-filter.tabs-tab) {
+    border-radius: 2px;
+  }
+
+  /* The graduated panel is as flat as the explore panel: no tint or glow. */
+  html[data-theme='dark'] .launchpad-explore-shell .launch-explore-graduated {
+    background: var(--bg-white);
+    box-shadow: none;
+    border-color: var(--term-line);
+  }
+  html[data-theme='dark'] .launchpad-explore-shell .launch-explore-graduated .launch-explore-count {
+    background: var(--panel-blue);
+  }
+
+  /* Filters: outlined group, selected option uses the same white block as pagination */
+  html[data-theme='dark'] .launchpad-explore-shell .launch-explore-filter-group.tabs-pill .tabs-list {
+    background: none;
+    border-color: var(--term-line);
+    box-shadow: none;
+  }
+  .launchpad-explore-shell .launch-explore-filter-group .tabs-indicator {
+    opacity: 1;
+    background: var(--text-primary);
+    box-shadow: none;
+  }
+  .launchpad-explore-shell .launch-explore-filter.tabs-tab.is-active {
+    color: var(--bg-page);
+  }
+
+  /* Toolbar: search and Create share one outline and one height */
+  .launchpad-explore-shell .launch-explore-toolbar {
+    align-items: stretch;
+  }
+  .launchpad-explore-shell :is(.launch-explore-search, .launch-explore-create-btn) {
+    border: 1px solid var(--term-line);
+  }
+
+  /* Phones: no keyboard hint */
+  @media (max-width: 720px) {
+    .launchpad-explore-shell .launch-explore-kbd {
+      display: none;
+    }
+  }
+
+  /* Sort tabs scroll sideways when they outgrow the panel */
+  .launchpad-explore-shell .launch-explore-filter-group {
+    max-width: 100%;
+    min-width: 0;
+  }
+  .launchpad-explore-shell .launch-explore-filter-group .tabs-list {
+    max-width: 100%;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+  .launchpad-explore-shell .launch-explore-filter.tabs-tab {
+    flex-shrink: 0;
+  }
+}
+
+/*
+ * Search dialog: Pons's spotlight panel as a native modal dialog, in the terminal style. Square
+ * corners, the white selected block, no lift or sliding arrow, and no green outside the focus ring.
+ */
+@layer components {
+  .launch-search.spotlight-panel {
+    inset: 12vh auto auto 50%;
+    max-width: none;
+    max-height: 76vh;
+    margin: 0;
+    padding: 0;
+    border: 1px solid var(--term-line);
+    border-radius: 2px;
+    color: var(--text-primary);
+    transform: translateX(-50%);
+  }
+  .launch-search::backdrop {
+    background: rgba(8, 8, 8, 0.78);
+  }
+  .launch-search-body {
+    display: grid;
+    grid-template-rows: auto auto minmax(0, 1fr) auto;
+    max-height: inherit;
+  }
+  .launch-search :is(.spotlight-close, .spotlight-filter-pill, .spotlight-result, .spotlight-page-button) {
+    border-radius: 2px;
+  }
+
+  /* Selected filter: the Paper White block with Void Black text, as on the Explore tabs */
+  .launch-search .spotlight-filter-pill.is-active {
+    border-color: var(--text-primary);
+    background: var(--text-primary);
+    color: var(--bg-page);
+    box-shadow: none;
+  }
+
+  /* Result: hover and highlight are the Faint Wash only */
+  .launch-search .spotlight-result.is-active {
+    transform: none;
+  }
+  .launch-search .spotlight-result-arrow,
+  .launch-search .spotlight-result:is(:hover, .is-active) .spotlight-result-arrow {
+    transform: none;
+    transition: opacity var(--duration-fast) var(--ease-out);
+  }
+  .launch-search .spotlight-result-logo {
+    border-radius: 0;
+    outline: 1px solid var(--term-line);
+  }
+  .launch-search-status {
+    flex-shrink: 0;
+    color: var(--text-muted);
+    font-size: 10px;
+  }
+  .launch-search-status.is-graduated {
+    color: var(--text-primary);
+  }
+
+  .launch-search .spotlight-empty.is-error {
+    color: var(--text-primary);
+  }
+  @media (max-width: 620px) {
+    .launch-search.spotlight-panel {
+      inset-block-start: 12px;
+      max-height: calc(100vh - 24px);
+    }
+  }
+}

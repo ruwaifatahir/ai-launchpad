@@ -1,0 +1,42 @@
+/// A quote asset's daily rate: its Chainlink answer at the close of one UTC day, the
+/// answer of the last round the feed updated before the next midnight. It prices that
+/// day's volume in dollars.
+///
+/// Written once by the daily rates job and never changed or deleted, so a day's dollar
+/// volume stays as it was priced. A day with no row has no dollar volume, and the next
+/// run of the job tries it again.
+///
+/// Keyed by quote asset rather than by feed, so pointing a quote asset at a new feed
+/// prices the days still missing and leaves the stored ones alone. The feed is kept
+/// beside the answer so any rate can be traced back and checked on chain.
+model DailyRate {
+  /// The chain the quote asset lives on, CHAIN_ID when the row was written.
+  chainId Int
+
+  /// The quote asset's address, lowercase, as the indexer writes it. The zero address
+  /// is native ETH.
+  quoteAsset String
+
+  /// The start of the UTC day the rate closes.
+  day DateTime @db.Date
+
+  /// The feed's answer as it gave it, a raw integer in the feed's decimals. Always
+  /// above zero: a feed answering zero or below stores nothing.
+  answer Decimal @db.Decimal(78, 0)
+
+  /// The feed's decimals when it answered.
+  decimals Int
+
+  /// The Chainlink feed the rate was read from, as FEEDS names it.
+  feed String
+
+  /// The round the answer came from, as the proxy numbers it, phase included. Past
+  /// what a bigint column holds, as a uint80 can be.
+  roundId Decimal @db.Decimal(78, 0)
+
+  /// When the feed last updated that round, always before the day's close.
+  roundUpdatedAt DateTime
+
+  @@id([chainId, quoteAsset, day])
+  @@map("daily_rates")
+}

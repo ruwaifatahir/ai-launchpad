@@ -1,0 +1,750 @@
+/*
+ * Token page on the launchpad's rules: launchpad width, flat square panels,
+ * bordered cells, a grey price line with only the live point in green.
+ */
+
+/* Same cascade layer as the global design CSS, so Tailwind utilities still win. */
+@layer components {
+  .token-buy-shell {
+    --radius-card: 2px;
+    --radius-panel: 2px;
+    --radius-pill: 2px;
+    max-width: min(100%, 1080px);
+  }
+  .token-buy-page {
+    gap: 16px;
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  /* Panels: same as the Explore panel */
+  .token-buy-shell
+    :is(
+      .convert-card,
+      .token-market-card,
+      .token-activity-card,
+      .token-about-card,
+      .token-creator-fees-card,
+      .token-agent-card,
+      .token-status-card
+    ) {
+    padding: 24px;
+    border: 1px solid var(--term-line);
+    border-radius: 2px;
+    background: var(--bg-white);
+    box-shadow: none;
+  }
+
+  /* Back link: plain secondary button */
+  .token-buy-shell .token-buy-back {
+    border-color: var(--term-line);
+    border-radius: 2px;
+    box-shadow: none;
+  }
+
+  /* Square logos and badges, no glass */
+  .token-buy-shell .token-buy-logo {
+    border-radius: 0;
+    outline: 1px solid var(--term-line);
+  }
+  html[data-theme='dark'] .token-buy-shell .pair-badge {
+    border-color: var(--term-line);
+    border-radius: 2px;
+    background: none;
+    box-shadow: none;
+    backdrop-filter: none;
+  }
+
+  /* Trade: flat inner panels, square controls */
+  html[data-theme='dark'] .token-buy-shell .convert-panel {
+    border-color: var(--term-line);
+    border-radius: 2px;
+    background: transparent;
+  }
+  .token-buy-shell :is(.convert-currency, .convert-swap, .ui-btn) {
+    border-radius: 2px;
+  }
+
+  /* Buttons: the header's weight, one line in the narrow trade column */
+  .token-buy-shell .ui-btn {
+    min-height: 48px;
+    padding: 12px 16px;
+    font-size: 15px;
+    white-space: nowrap;
+  }
+  .token-buy-shell .token-trade-hint {
+    margin: -8px 0 0;
+  }
+
+  /*
+   * Amounts fit their field. Each field says how wide its amount runs (`--amount-ems`, set by the
+   * component), and the font shrinks from its resting size until that width fits the container,
+   * down to a floor where anything longer is clipped rather than spilling over the panel.
+   */
+  .token-buy-shell .token-buy-card .convert-amount {
+    container-type: inline-size;
+  }
+  .token-buy-shell .token-buy-card .convert-amount-field,
+  .token-buy-shell .token-buy-card .convert-amount-editing {
+    overflow: hidden;
+  }
+  .token-buy-shell .token-buy-card .convert-amount-field {
+    --amount-size: max(0.95rem, min(clamp(1.85rem, 4.2vw, 2.45rem), calc(100cqw / var(--amount-ems, 1))));
+  }
+  .token-buy-shell .token-buy-card :is(.convert-amount-digits, .convert-amount-edit-face, .convert-amount-caret),
+  .token-buy-shell .token-buy-card .convert-amount-input.is-editing {
+    font-size: var(--amount-size);
+  }
+
+  /* Typing: the focused panel lights up, and the caret sits inline where the cursor is */
+  html[data-theme='dark'] .token-buy-shell .convert-panel:focus-within {
+    border-color: var(--text-subtle);
+  }
+  .token-buy-shell .convert-amount-caret.is-inline {
+    display: inline-block;
+    position: relative;
+    top: auto;
+    width: 2px;
+    height: 0.9em;
+    margin: 0 1px;
+    vertical-align: -0.1em;
+    font-size: inherit;
+    transform: none;
+  }
+
+  /* Market stats: separate bordered cells, like the analytics stats */
+  html[data-theme='dark'] .token-buy-shell .token-market-stats {
+    gap: 12px;
+    border-radius: 0;
+    background: none;
+  }
+  .token-buy-shell .token-market-stats > div {
+    padding: 12px 16px;
+    border: 1px solid var(--term-line);
+    background: transparent;
+  }
+
+  /* Graduation progress: one bordered row under the stats, the same bar as on Explore */
+  .token-buy-shell .token-market-card:has(.token-graduation) {
+    grid-template-rows: auto auto minmax(0, 1fr);
+  }
+  .token-buy-shell .token-graduation {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 8px 12px;
+    padding: 12px 16px;
+    border: 1px solid var(--term-line);
+    color: var(--text-muted);
+    font-size: 13px;
+    font-variant-numeric: tabular-nums;
+  }
+  .token-buy-shell .token-graduation-bar {
+    align-self: center;
+    width: 120px;
+  }
+  .token-buy-shell .token-graduation-raised {
+    margin-left: auto;
+    color: var(--text-primary);
+  }
+
+  /* "N available" as a button that fills in the whole balance */
+  .token-buy-shell .convert-balance-fill {
+    padding: 0;
+    border: 0;
+    background: none;
+    font: inherit;
+    cursor: pointer;
+    transition: color var(--duration-normal) var(--ease-out);
+  }
+  .token-buy-shell .convert-balance-fill:hover {
+    color: var(--text-primary);
+  }
+  .token-buy-shell .convert-balance-fill:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+  }
+
+  /* Chart: grey line and fill, the live point in green */
+  .token-buy-shell .token-market-chart {
+    --chart-line: var(--text-muted);
+  }
+  .token-buy-shell .token-market-chart .noxa-chart-stage {
+    border-radius: 0;
+    background: none;
+  }
+  /* Loading, empty and unavailable take the chart's own space, so the card keeps its height */
+  .token-buy-shell .token-market-chart .noxa-chart-empty {
+    position: static;
+    min-height: 0;
+    margin: 0;
+    aspect-ratio: 640 / 248;
+  }
+  .token-buy-shell .noxa-chart-live-dot {
+    fill: var(--accent);
+    stroke: var(--bg-white);
+  }
+  .token-buy-shell .noxa-chart-ranges {
+    padding: 2px;
+    border: 1px solid var(--term-line);
+    border-radius: 2px;
+    background: none;
+  }
+  html[data-theme='dark'] .token-buy-shell .noxa-chart-range.is-active {
+    background: var(--text-primary);
+    color: var(--bg-page);
+  }
+
+  /* Hover: a grey cursor line, the point in white, and the tooltip on a raised grey panel */
+  /* A sideways drag reads the chart; an up or down one still scrolls the page */
+  .token-buy-shell .token-market-chart :is(.noxa-chart-svg, .noxa-chart-scrub-hit) {
+    touch-action: pan-y;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .token-buy-shell .token-market-chart .noxa-chart-svg:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: -2px;
+  }
+  html[data-theme='dark'] .token-buy-shell .noxa-chart-cursor line {
+    stroke: var(--text-subtle);
+    vector-effect: non-scaling-stroke;
+  }
+  /* Green stays on the live point, which keeps showing at now */
+  .token-buy-shell .noxa-chart-cursor circle {
+    fill: var(--text-primary);
+    stroke: var(--bg-white);
+  }
+  .token-buy-shell .token-chart-tooltip {
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 1;
+    display: grid;
+    gap: 2px;
+    padding: 8px 10px;
+    border: 1px solid var(--term-line);
+    border-radius: 2px;
+    background: var(--bg-elevated);
+    white-space: nowrap;
+    font-variant-numeric: tabular-nums;
+    pointer-events: none;
+  }
+  .token-buy-shell :is(.token-chart-tooltip-label, .token-chart-tooltip-time) {
+    color: var(--text-subtle);
+    font-size: 11px;
+  }
+  .token-buy-shell .token-chart-tooltip-value {
+    color: var(--text-primary);
+    font-size: 13px;
+  }
+  /* The hovered time takes the change's place, in the grey of every other timestamp */
+  .token-buy-shell .noxa-chart-change.is-scrubbing {
+    color: var(--text-subtle);
+    font-size: 13px;
+    letter-spacing: normal;
+  }
+
+  /* Activity: outlined tab group, white block for the selected tab */
+  html[data-theme='dark'] .token-buy-shell .token-activity-tabs .tabs-list {
+    gap: 2px;
+    padding: 2px;
+    border: 1px solid var(--term-line);
+    border-radius: 2px;
+    background: none;
+    box-shadow: none;
+  }
+  .token-buy-shell .token-activity-tabs .tabs-tab {
+    padding: 6px 12px;
+    border-radius: 2px;
+    font-size: 13px;
+  }
+  .token-buy-shell .token-activity-tabs .tabs-tab.is-active {
+    background: var(--text-primary);
+    color: var(--bg-page);
+  }
+  /* Each tab carries its own count, so the number always says what it counts */
+  .token-buy-shell .token-activity-tabs .tabs-tab {
+    gap: 8px;
+  }
+  .token-buy-shell .token-activity-count {
+    min-width: 0;
+    padding: 0;
+    border-radius: 0;
+    background: none;
+    color: var(--text-subtle);
+    font-size: 12px;
+    font-variant-numeric: tabular-nums;
+  }
+  .token-buy-shell .tabs-tab.is-active .token-activity-count {
+    color: inherit;
+    opacity: 0.6;
+  }
+  .token-buy-shell .token-trades-row {
+    border-radius: 0;
+  }
+  .token-buy-shell .token-trades-row.is-buy .token-trades-dir {
+    color: var(--text-primary);
+  }
+  /* Muted, not subtle: a sell is as real as a buy and must not read as disabled */
+  .token-buy-shell .token-trades-row.is-sell .token-trades-dir {
+    color: var(--text-muted);
+  }
+  .token-buy-shell .token-trades-side {
+    color: var(--text-muted);
+  }
+  /* On a phone the symbol is the page's own, so the amount keeps its room without it */
+  @media (max-width: 480px) {
+    .token-buy-shell .token-trades-symbol {
+      display: none;
+    }
+  }
+  .token-buy-shell .token-trades-amount:hover {
+    text-decoration: underline;
+    text-decoration-color: var(--text-subtle);
+    text-underline-offset: 3px;
+  }
+
+  /* Loading: placeholder rows the height of real ones, so nothing jumps when they land */
+  .token-buy-shell .token-activity-loading {
+    display: grid;
+    gap: 2px;
+  }
+  .token-buy-shell .token-activity-placeholder {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    min-height: 56px;
+    padding: 10px 8px 10px 42px;
+  }
+  .token-buy-shell .token-activity-placeholder .skeleton {
+    height: 14px;
+    border-radius: 2px;
+  }
+  .token-buy-shell .token-activity-placeholder-main {
+    width: min(180px, 45%);
+  }
+  .token-buy-shell .token-activity-placeholder-side {
+    width: 72px;
+  }
+  .token-buy-shell .token-activity-empty {
+    margin: 0;
+    padding: 32px 8px;
+    color: var(--text-muted);
+    font-size: 13px;
+    text-align: center;
+  }
+
+  /* Holders: rank, wallet, share with its bar, balance */
+  .token-buy-shell .token-holder-row.v2-token-holder-row {
+    /* A fixed rank width: `ch` would differ between the smaller header row and the body rows */
+    grid-template-columns: 24px minmax(0, 1.4fr) minmax(120px, 0.8fr) minmax(96px, 0.7fr);
+  }
+  .token-buy-shell .token-holder-row > .token-holder-identity,
+  .token-buy-shell .token-holder-row.is-head > span:nth-child(2) {
+    text-align: left;
+  }
+  .token-buy-shell .token-holder-rank {
+    color: var(--text-subtle);
+    font-size: 12px;
+    font-variant-numeric: tabular-nums;
+  }
+  .token-buy-shell .token-holder-share {
+    display: grid;
+    justify-items: end;
+    gap: 6px;
+  }
+  .token-buy-shell .token-holder-share-bar {
+    position: relative;
+    width: 100%;
+    max-width: 120px;
+    height: 2px;
+    background: var(--term-line);
+  }
+  .token-buy-shell .token-holder-share-bar::after {
+    position: absolute;
+    inset: 0 auto 0 0;
+    width: var(--share);
+    background: var(--text-muted);
+    content: '';
+  }
+  .token-buy-shell .token-holder-wallet {
+    color: var(--text-primary);
+    letter-spacing: var(--tracking);
+    font-size: 13px;
+  }
+  /* A wallet links to its Profile; a contract's address stays plain text */
+  .token-buy-shell .v2-about-creator a {
+    color: inherit;
+  }
+  .token-buy-shell :is(a.token-holder-wallet, a.token-trades-wallet, .v2-about-creator a) {
+    text-decoration: none;
+    border-radius: 2px;
+  }
+  .token-buy-shell :is(a.token-holder-wallet, a.token-trades-wallet, .v2-about-creator a):hover {
+    color: var(--text-primary);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+  .token-buy-shell :is(a.token-holder-wallet, a.token-trades-wallet, .v2-about-creator a):focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+  }
+  .token-buy-shell span.token-trades-wallet:hover {
+    color: var(--text-muted);
+  }
+  .token-buy-shell .v2-about-terms .v2-about-creator {
+    color: inherit;
+  }
+  .token-buy-shell .token-holder-note {
+    margin: 12px 0 0;
+    color: var(--text-subtle);
+    font-size: 12px;
+  }
+
+  /* Empty chart range: say what is missing and offer the range that has trades */
+  .token-buy-shell .token-chart-empty {
+    display: grid;
+    place-content: center;
+    justify-items: center;
+    gap: 12px;
+  }
+  .token-buy-shell .token-chart-empty p {
+    margin: 0;
+  }
+  .token-buy-shell .token-chart-empty-action {
+    padding: 6px 12px;
+    border: 1px solid var(--term-line);
+    border-radius: 2px;
+    background: none;
+    color: var(--text-primary);
+    font: inherit;
+    font-size: 13px;
+    cursor: pointer;
+    transition: background var(--duration-fast) var(--ease-out);
+  }
+  .token-buy-shell .token-chart-empty-action:hover {
+    background: var(--accent-soft);
+  }
+  .token-buy-shell .token-chart-empty-action:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+  }
+  /* The protocol's own trades: a plain white word before the wallet that signed them, no tag */
+  .token-buy-shell .token-trades-by {
+    display: flex;
+    min-width: 0;
+    align-items: baseline;
+    gap: 6px;
+  }
+  .token-buy-shell .token-trades-kind,
+  .token-buy-shell .token-holder-kind {
+    flex: 0 0 auto;
+    color: var(--text-primary);
+    font-size: 12px;
+    white-space: nowrap;
+  }
+  .token-buy-shell .token-trades-eth .quote-asset-chip {
+    width: 20px;
+    height: 20px;
+  }
+  .token-buy-shell .page-control-indicator {
+    background: var(--text-primary);
+  }
+  html[data-theme='dark'] .token-buy-shell .page-control-page.is-active {
+    color: var(--bg-page);
+  }
+  html[data-theme='dark'] .token-buy-shell .page-control-list {
+    background: none;
+  }
+
+  /* About: outlined link buttons */
+  .token-buy-shell :is(.token-info-links a, .token-info-links button) {
+    border: 1px solid var(--term-line);
+    border-radius: 2px;
+    background: none;
+    transition: background var(--duration-fast) var(--ease-out);
+  }
+  .token-buy-shell :is(.token-info-links a, .token-info-links button):hover {
+    transform: none;
+    background: var(--accent-soft);
+  }
+  .token-buy-shell :is(.token-info-links a, .token-info-links button):active {
+    background: var(--accent-mid);
+  }
+  /* Copy: the button answers the click on its own, before the toast arrives */
+  .token-buy-shell .token-copy-address {
+    transition:
+      background var(--duration-fast) var(--ease-out),
+      border-color var(--duration-fast) var(--ease-out),
+      color var(--duration-fast) var(--ease-out);
+  }
+  .token-buy-shell .token-copy-address .ui-icon {
+    color: var(--text-muted);
+  }
+  .token-buy-shell .token-copy-address.is-copied {
+    border-color: var(--accent);
+  }
+  .token-buy-shell .token-copy-address.is-copied .ui-icon {
+    color: var(--accent);
+  }
+
+  /* Fees: one bordered cell for the claimable amount, quiet hint */
+  .token-buy-shell .token-creator-fees-assets {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .token-buy-shell .token-creator-fees-assets > div {
+    padding: 16px;
+    border: 1px solid var(--term-line);
+    border-radius: 0;
+    background: transparent;
+  }
+  .token-buy-shell .token-creator-fees-note {
+    color: var(--text-muted);
+    font-size: 12px;
+  }
+  /*
+   * Claim: the same solid button as Buy, sized to its label. The design CSS styles any button in
+   * this row as a bare text link, which left Claim green-on-green once hovered.
+   */
+  .token-buy-shell .token-creator-fees-state .ui-btn {
+    background: var(--accent);
+    color: var(--accent-contrast);
+  }
+  .token-buy-shell .token-creator-fees-state .ui-btn:hover:not(:disabled) {
+    background: var(--accent-hover);
+  }
+  .token-buy-shell .token-creator-fees-state .ui-btn:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 3px;
+  }
+  .token-buy-shell .token-creator-fees-hint {
+    margin: 0;
+    color: var(--text-subtle);
+    font-size: 13px;
+  }
+  .token-buy-shell .token-fee-sharing-copy {
+    max-width: 72ch;
+    margin: 0;
+    color: var(--text-muted);
+    font-size: 14px;
+    line-height: 1.5;
+  }
+
+  /* Loading: the page in outline, square bones on the page's grid */
+  .token-buy-shell .skeleton {
+    border-radius: 2px;
+  }
+  .token-buy-shell .token-skeleton-logo {
+    width: 50px;
+    height: 50px;
+  }
+  .token-buy-shell .token-skeleton-identity {
+    display: grid;
+    gap: 8px;
+  }
+  .token-buy-shell .token-skeleton-name {
+    width: 55%;
+    height: 18px;
+  }
+  .token-buy-shell .token-skeleton-symbol {
+    width: 35%;
+    height: 12px;
+  }
+  .token-buy-shell .token-skeleton-panel {
+    display: grid;
+    gap: 14px;
+  }
+  .token-buy-shell .token-skeleton-label {
+    width: 56px;
+    height: 10px;
+  }
+  .token-buy-shell .token-skeleton-amount {
+    width: 45%;
+    height: 34px;
+  }
+  .token-buy-shell .token-skeleton-panel-foot {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .token-buy-shell .token-skeleton-chip {
+    width: 84px;
+    height: 36px;
+  }
+  .token-buy-shell .token-skeleton-balance {
+    width: 110px;
+    height: 10px;
+  }
+  .token-buy-shell .token-skeleton-button {
+    width: 100%;
+    height: 48px;
+  }
+  .token-buy-shell .token-skeleton-stats {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 12px;
+  }
+  .token-buy-shell .token-skeleton-stat {
+    display: grid;
+    gap: 10px;
+    padding: 12px 16px;
+    border: 1px solid var(--term-line);
+  }
+  .token-buy-shell .token-skeleton-value {
+    width: 70%;
+    height: 14px;
+  }
+  .token-buy-shell .token-skeleton-chart {
+    width: 100%;
+    min-height: 360px;
+  }
+  @media (max-width: 720px) {
+    .token-buy-shell .token-skeleton-stats {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 8px;
+    }
+    .token-buy-shell .token-skeleton-chart {
+      min-height: 220px;
+    }
+  }
+
+  /* Not found and error: one quiet panel in place of the page */
+  .token-buy-shell .token-status-card {
+    display: grid;
+    justify-items: start;
+    gap: 12px;
+  }
+  .token-buy-shell .token-status-card h1 {
+    margin: 0;
+    font-size: 19px;
+    font-weight: 400;
+  }
+  .token-buy-shell .token-status-card p,
+  .token-buy-shell .token-trade-notice {
+    max-width: 72ch;
+    margin: 0;
+    color: var(--text-muted);
+    font-size: 14px;
+    line-height: 1.5;
+  }
+  .token-buy-shell .token-status-card a {
+    color: var(--text-primary);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+  .token-buy-shell .token-status-card .ui-btn {
+    width: auto;
+  }
+  .token-buy-shell .token-trade-notice,
+  .token-buy-shell .token-graduation-action {
+    margin-top: 20px;
+  }
+
+  /* Narrow screens: columns may shrink below their content */
+  .token-buy-shell .token-market-card {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  @media (max-width: 899px) {
+    .token-buy-shell .token-buy-layout {
+      grid-template-columns: minmax(0, 1fr);
+    }
+  }
+
+  /* Phones: tighter panels, chart head wraps, shorter chart */
+  @media (max-width: 720px) {
+    .token-buy-shell
+      :is(
+        .convert-card,
+        .token-market-card,
+        .token-activity-card,
+        .token-about-card,
+        .token-creator-fees-card,
+        .token-agent-card,
+        .token-status-card
+      ) {
+      padding: 16px;
+    }
+    .token-buy-shell .token-market-card {
+      min-height: 0;
+    }
+    .token-buy-shell .token-market-stats {
+      gap: 8px;
+    }
+    .token-buy-shell .token-market-stats > div {
+      padding: 10px 12px;
+    }
+    .token-buy-shell .token-market-chart .noxa-chart-head {
+      flex-wrap: wrap;
+    }
+    /* The chart keeps its aspect ratio, so the stage hugs it instead of letterboxing */
+    .token-buy-shell .token-market-chart .noxa-chart-stage {
+      flex: none;
+      height: auto;
+      min-height: 0;
+    }
+    .token-buy-shell .token-market-chart .noxa-chart-svg {
+      display: block;
+      position: static;
+      width: 100%;
+      height: auto;
+    }
+  }
+}
+
+/* Agent: the Creator's own line to their token's Agent, a status beside the way in */
+@layer components {
+  .token-buy-shell .token-agent-card {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+  }
+  .token-agent-copy {
+    display: grid;
+    gap: 6px;
+    min-width: 0;
+  }
+  .token-agent-copy h2 {
+    margin: 0;
+    font-size: 19px;
+    font-weight: 400;
+    letter-spacing: var(--tracking);
+  }
+  .token-agent-status {
+    margin: 0;
+    color: var(--text-muted);
+    font-size: 14px;
+  }
+  .token-agent-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .token-agent-link {
+    display: inline-flex;
+    align-items: center;
+    min-height: 40px;
+    padding: 8px 14px;
+    border: 1px solid var(--term-line);
+    border-radius: 2px;
+    background: var(--bg-white);
+    color: var(--text-primary);
+    font: inherit;
+    font-size: 13px;
+    text-decoration: none;
+    cursor: pointer;
+    transition: background var(--duration-fast) var(--ease-out);
+  }
+  .token-agent-link:hover:not(:disabled) {
+    background: var(--accent-soft);
+  }
+  .token-agent-link:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+  }
+  .token-agent-link:disabled {
+    color: var(--text-subtle);
+    cursor: default;
+  }
+}

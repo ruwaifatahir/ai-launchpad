@@ -1,0 +1,26 @@
+packages:
+  - "apps/*"
+  - "packages/*"
+
+# Packages whose install scripts are allowed to run. Everything else is blocked.
+allowBuilds:
+  "@prisma/client": true
+  "@prisma/engines": true
+  esbuild: true
+  prisma: true
+  sharp: true
+  # Optional native speed-ups and telemetry; each has a working fallback without its script.
+  "@scarf/scarf": false
+  bufferutil: false
+  keccak: false
+  msgpackr-extract: false
+  utf-8-validate: false
+
+overrides:
+  # Security patches for Ponder's own dependencies, which it pins below the fix. Each stays
+  # within the version range Ponder was built against.
+  "@hono/node-server": ^1.19.15
+  ws: ^8.21.0
+  # Security patches for transitive dependencies of the API.
+  deepmerge-ts: ^8.0.2
+  effect: ^3.20.0

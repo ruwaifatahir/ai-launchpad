@@ -1,0 +1,53 @@
+/*
+ * Toasts on the terminal rules: a flat Graphite panel with a hairline, 2px corners.
+ * The icon carries the tone: Paper White for done, danger red for failed.
+ */
+@layer components {
+  .toast-list {
+    display: grid;
+    gap: 8px;
+    width: min(360px, calc(100vw - 48px));
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  html[data-theme] .toast-item {
+    border: 1px solid var(--term-line, var(--divider));
+    border-radius: 2px;
+    background: var(--bg-white);
+    color: var(--text-primary);
+    box-shadow: none;
+    animation: toast-in var(--duration-normal) var(--ease-out);
+  }
+  .toast-item p {
+    margin: 0;
+  }
+  html[data-theme] .toast-icon {
+    border-radius: 2px;
+    outline: 1px solid var(--term-line, var(--divider));
+  }
+  html[data-theme] .toast-item.is-error .toast-icon {
+    color: var(--danger);
+  }
+  .toast-description {
+    overflow-wrap: anywhere;
+  }
+  .toast-action {
+    display: inline-block;
+  }
+  html[data-theme] .toast-close {
+    border-radius: 2px;
+  }
+
+  @keyframes toast-in {
+    from {
+      opacity: 0;
+      transform: translateY(-6px);
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    html[data-theme] .toast-item {
+      animation: none;
+    }
+  }
+}

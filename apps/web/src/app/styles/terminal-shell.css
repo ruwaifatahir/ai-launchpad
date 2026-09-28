@@ -1,0 +1,154 @@
+/*
+ * The terminal look shared by every page that lists tokens: square panels, square bordered
+ * cards with a status header, block-character progress bars and a white block for the current
+ * page. A page opts in by putting `terminal-shell` on its shell.
+ */
+
+.terminal-shell {
+  --radius-pill: 2px;
+  grid-template-columns: minmax(0, 1fr);
+}
+
+/* Section panels */
+.terminal-shell .launch-explore {
+  border-radius: 2px;
+  border-color: var(--term-line);
+}
+.terminal-shell .launch-explore-count {
+  border-radius: 2px;
+}
+.terminal-shell .launch-explore-pagination * {
+  border-radius: 2px;
+}
+
+/* Grid: separate square cells with thin borders */
+.terminal-shell .launch-explore-grid {
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 12px;
+}
+.terminal-shell .launch-explore-grid > li {
+  border: 1px solid var(--term-line);
+}
+
+/* In place of the grid: loading, an empty list, or the indexer not answering */
+.terminal-shell .launch-explore-status {
+  display: grid;
+  place-content: center;
+  justify-items: center;
+  gap: 14px;
+  min-height: 160px;
+  margin: 0;
+  padding: 24px;
+  border: 1px dashed var(--term-line);
+  color: var(--text-muted);
+  font-size: 13px;
+  text-align: center;
+}
+.terminal-shell .launch-explore-status p {
+  margin: 0;
+}
+.terminal-shell .launch-explore-status.is-error {
+  color: var(--text-primary);
+}
+
+/* Card */
+.terminal-shell .launch-card {
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-rows: auto auto 1fr;
+  gap: 10px;
+  height: 100%;
+  padding: 12px;
+  border-radius: 0;
+  background: transparent;
+  transition: background var(--duration-fast) var(--ease-out);
+}
+.terminal-shell .launch-card:hover {
+  transform: none;
+  background: var(--accent-soft);
+}
+.terminal-shell .launch-card:focus-visible {
+  outline-offset: -2px;
+}
+
+.launch-card-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  color: var(--text-subtle);
+  font-size: 10px;
+  font-variant-numeric: tabular-nums;
+}
+.launch-card-status {
+  color: var(--text-muted);
+}
+.launch-card-status.is-graduated {
+  color: var(--text-primary);
+}
+
+.terminal-shell .launch-card-logo,
+.terminal-shell .launch-card-logo img {
+  border-radius: 0;
+}
+.terminal-shell .launch-card-logo {
+  outline: 1px solid var(--term-line);
+}
+
+/* Graduation progress: a solid bar that takes the row, with the percentage after it */
+.launch-card-graduation .launch-card-grad-bar {
+  flex: 1 1 auto;
+  min-width: 0;
+  height: 6px;
+}
+.terminal-shell .launch-card-grad-pct {
+  color: var(--text-muted);
+}
+
+/* Last-buy time stays neutral rather than highlighted */
+.terminal-shell .launch-card-meta time.is-recent-buy {
+  color: var(--text-muted);
+}
+
+/* Card footer stays on one line: address truncates, time never wraps */
+.terminal-shell .launch-card-deployer {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.terminal-shell .launch-card-meta time {
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+.terminal-shell .launch-card-body {
+  min-width: 0;
+}
+.terminal-shell .launch-card-mcap {
+  flex-wrap: wrap;
+  row-gap: 0;
+}
+
+/* Pagination: no backing panel, white block for the current page */
+.terminal-shell .page-control-indicator {
+  background: var(--text-primary);
+}
+html[data-theme='dark'] .terminal-shell .page-control-page.is-active {
+  color: var(--bg-page);
+}
+html[data-theme='dark'] .terminal-shell .page-control-list {
+  background: none;
+}
+
+/* Phones: two narrow columns and a tighter panel */
+@media (max-width: 720px) {
+  .terminal-shell .launch-explore {
+    grid-template-columns: minmax(0, 1fr);
+    padding: 16px;
+  }
+  .terminal-shell .launch-explore-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+  }
+  .terminal-shell .launch-card {
+    padding: 10px;
+  }
+}

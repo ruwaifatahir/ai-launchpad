@@ -1,0 +1,52 @@
+/* The return from X with no token to go back to: one quiet panel, as the Agent page's notices. */
+@layer components {
+  .connect-x-shell {
+    max-width: 1080px;
+  }
+  .connect-x-busy {
+    margin: 0;
+    color: var(--text-muted);
+    font-size: 14px;
+  }
+  .connect-x-notice {
+    display: grid;
+    justify-items: start;
+    gap: 12px;
+    padding: 24px;
+    border: 1px solid var(--term-line);
+    border-radius: 2px;
+    background: var(--bg-white);
+  }
+  .connect-x-notice h1 {
+    margin: 0;
+    font-size: 19px;
+    font-weight: 400;
+    letter-spacing: var(--tracking);
+    text-wrap: balance;
+  }
+  .connect-x-notice p {
+    max-width: 72ch;
+    margin: 0;
+    color: var(--text-muted);
+    font-size: 14px;
+    line-height: 1.5;
+  }
+  .connect-x-link {
+    color: var(--text-primary);
+    font-size: 14px;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+  .connect-x-link:hover {
+    text-decoration-color: var(--text-muted);
+  }
+  .connect-x-link:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+  }
+  @media (max-width: 720px) {
+    .connect-x-notice {
+      padding: 16px;
+    }
+  }
+}

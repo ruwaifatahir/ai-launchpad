@@ -1,0 +1,136 @@
+# The whole backend on one server: API, indexer, their databases, Redis, and Caddy for HTTPS.
+# The frontend is a static site and is hosted elsewhere. See docs/self-hosting.md.
+#
+#   cp deploy/.env.example deploy/.env      # passwords and the API domain
+#   GIT_SHA=$(git rev-parse --short HEAD) docker compose -f deploy/compose.yml up -d --build
+#
+# App settings come from apps/api/.env and apps/indexer/.env.local. The database and Redis
+# addresses below override theirs, so the same files work locally and here.
+
+services:
+  caddy:
+    image: caddy:2-alpine
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+      - "443:443/udp"
+    environment:
+      API_DOMAIN: ${API_DOMAIN:?set API_DOMAIN in deploy/.env}
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy-data:/data
+      - caddy-config:/config
+    depends_on:
+      - api
+
+  api:
+    build:
+      context: ..
+      dockerfile: apps/api/Dockerfile
+    restart: unless-stopped
+    env_file: ../apps/api/.env
+    environment:
+      NODE_ENV: production
+      # Caddy is the one proxy in front.
+      TRUST_PROXY: "1"
+      DATABASE_URL: postgresql://postgres:${API_DB_PASSWORD:?set API_DB_PASSWORD}@api-db:5432/app
+      INDEXER_DATABASE_URL: postgresql://postgres:${INDEXER_DB_PASSWORD:?set INDEXER_DB_PASSWORD}@indexer-db:5432/indexer
+      REDIS_URL: redis://redis:6379
+    depends_on:
+      api-db:
+        condition: service_healthy
+      indexer-db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+  # Creates or updates the API's tables. Run it once before the first start, and after
+  # any change under apps/api/prisma:
+  #   docker compose -f deploy/compose.yml run --rm api-schema
+  api-schema:
+    build:
+      context: ..
+      dockerfile: apps/api/Dockerfile
+      target: builder
+    profiles: [tools]
+    working_dir: /repo/apps/api
+    command: ["pnpm", "db:push"]
+    environment:
+      DATABASE_URL: postgresql://postgres:${API_DB_PASSWORD:?set API_DB_PASSWORD}@api-db:5432/app
+    depends_on:
+      api-db:
+        condition: service_healthy
+
+  indexer:
+    build:
+      context: ..
+      dockerfile: apps/indexer/Dockerfile
+      args:
+        # Each build writes to its own schema, so a code change reindexes from START_BLOCK.
+        GIT_SHA: ${GIT_SHA:-local}
+    restart: unless-stopped
+    env_file: ../apps/indexer/.env.local
+    environment:
+      # One schema per build, set here so DATABASE_SCHEMA in the .env file cannot pin it.
+      DATABASE_SCHEMA: indexer_${GIT_SHA:-local}
+      DATABASE_URL: postgresql://postgres:${INDEXER_DB_PASSWORD:?set INDEXER_DB_PASSWORD}@indexer-db:5432/indexer
+    depends_on:
+      indexer-db:
+        condition: service_healthy
+
+  api-db:
+    image: postgres:17-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: ${API_DB_PASSWORD:?set API_DB_PASSWORD}
+      POSTGRES_DB: app
+    volumes:
+      - api-db-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  indexer-db:
+    image: postgres:17-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: ${INDEXER_DB_PASSWORD:?set INDEXER_DB_PASSWORD}
+      POSTGRES_DB: indexer
+    volumes:
+      - indexer-db-data:/var/lib/postgresql/data
+    configs:
+      # The search indexes need pg_trgm, which Ponder does not create.
+      - source: pg-trgm
+        target: /docker-entrypoint-initdb.d/pg-trgm.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    volumes:
+      - redis-data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+configs:
+  pg-trgm:
+    content: CREATE EXTENSION IF NOT EXISTS pg_trgm;
+
+volumes:
+  caddy-data:
+  caddy-config:
+  api-db-data:
+  indexer-db-data:
+  redis-data:

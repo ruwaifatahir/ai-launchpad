@@ -1,0 +1,200 @@
+/*
+ * Create page on the launchpad's rules: one flat square panel, square fields
+ * with a single grey outline, the preview as a plain bordered column.
+ */
+
+/* Same cascade layer as the global design CSS, so Tailwind utilities still win. */
+@layer components {
+  .launchpad-create-page {
+    --radius-pill: 2px;
+    max-width: 1080px;
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  /* Back link: plain secondary button, same as the token page */
+  .launchpad-create-page .token-buy-back {
+    justify-self: start;
+    border-color: var(--term-line);
+    border-radius: 2px;
+    box-shadow: none;
+  }
+
+  /* Panel: same as the Explore panel */
+  html[data-theme='dark'] .launchpad-create-page .launchpad-create-shell {
+    border: 1px solid var(--term-line);
+    border-radius: 2px;
+    background: var(--bg-white);
+    box-shadow: none;
+  }
+  .launchpad-create-page .launchpad-create-form {
+    padding: 24px;
+  }
+  .launchpad-create-page .split-shell-title {
+    font-size: 24px;
+  }
+
+  /* Fields: square, transparent, one grey outline */
+  html[data-theme='dark']
+    .launchpad-create-page
+    :is(
+      .launchpad-input,
+      .launchpad-prefixed-input,
+      .launchpad-pair-trigger,
+      .launchpad-buy-field,
+      .launchpad-wallet-entry,
+      .launchpad-upload
+    ) {
+    border-color: var(--term-line);
+    border-radius: 2px;
+    background: transparent;
+    box-shadow: none;
+  }
+  html[data-theme='dark']
+    .launchpad-create-page
+    :is(
+      .launchpad-input:focus-visible,
+      .launchpad-prefixed-input:focus-within,
+      .launchpad-buy-field:focus-within,
+      .launchpad-wallet-entry:focus-within
+    ) {
+    border-color: var(--text-muted);
+    box-shadow: none;
+  }
+  .launchpad-create-page .launchpad-upload-thumb {
+    border-radius: 0;
+    background: none;
+    outline: 1px solid var(--term-line);
+  }
+  html[data-theme='dark'] .launchpad-create-page .launchpad-wallet-add {
+    border-radius: 2px;
+    background: none;
+  }
+  html[data-theme='dark'] .launchpad-create-page .launchpad-pair-menu {
+    border-color: var(--term-line);
+    border-radius: 2px;
+    background: var(--bg-white);
+  }
+  .launchpad-create-page .launchpad-field-note {
+    color: var(--text-subtle);
+  }
+
+  /* Advanced: plain divider rows; the switch is on when aria-checked */
+  html[data-theme='dark'] .launchpad-create-page .launchpad-disclosure {
+    border-color: var(--term-line);
+  }
+  .launchpad-create-page .launchpad-switch-knob,
+  .launchpad-create-page .launchpad-switch-knob::after {
+    border-radius: 2px;
+    box-shadow: none;
+  }
+  html[data-theme='dark'] .launchpad-create-page .launchpad-switch[aria-checked='true'] .launchpad-switch-knob {
+    background: var(--text-primary);
+  }
+  html[data-theme='dark'] .launchpad-create-page .launchpad-switch[aria-checked='true'] .launchpad-switch-knob::after {
+    background: var(--bg-page);
+    transform: translate(16px);
+  }
+
+  /* Preview: a quiet column split off by a line, no glass card */
+  html[data-theme='dark'] .launchpad-create-page .launchpad-preview-panel {
+    justify-content: flex-start;
+    padding: 24px;
+    border-left: 1px solid var(--term-line);
+    background: transparent;
+  }
+  html[data-theme='dark'] .launchpad-create-page .launchpad-token-preview {
+    max-width: none;
+    padding: 0;
+    border: 0;
+    border-radius: 0;
+    background: none;
+    box-shadow: none;
+    backdrop-filter: none;
+  }
+  .launchpad-create-page .launchpad-preview-image {
+    border-radius: 0;
+    background: none;
+    outline: 1px solid var(--term-line);
+  }
+  html[data-theme='dark'] .launchpad-create-page :is(.launchpad-preview-details, .launchpad-preview-details > div) {
+    border-color: var(--term-line);
+  }
+  @media (max-width: 819px) {
+    html[data-theme='dark'] .launchpad-create-page .launchpad-preview-panel {
+      min-height: 0;
+      border-top: 1px solid var(--term-line);
+      border-left: 0;
+    }
+  }
+
+  .launchpad-create-page .launchpad-create-actions .ui-btn {
+    border-radius: 2px;
+  }
+
+  /* Validation: the message under a field, and the outline of the field it names */
+  .launchpad-create-page .launchpad-field-error {
+    color: var(--danger);
+  }
+  html[data-theme] .launchpad-create-page :is(.launchpad-input, .launchpad-prefixed-input):has([aria-invalid='true']),
+  html[data-theme] .launchpad-create-page .launchpad-input[aria-invalid='true'] {
+    border-color: var(--danger);
+  }
+  html[data-theme] .launchpad-create-page .launchpad-buy-field.is-invalid {
+    border-color: var(--danger);
+  }
+  .launchpad-create-page .launchpad-buy-field.is-invalid .launchpad-buy-meta > span {
+    color: var(--danger);
+  }
+
+  /* Token image: a spinner in the thumb from the pick until the stored image has drawn */
+  .launchpad-create-page .launchpad-upload.is-busy {
+    cursor: progress;
+  }
+  .launchpad-create-page .launchpad-upload-thumb {
+    position: relative;
+  }
+  .launchpad-create-page .launchpad-upload.is-busy .launchpad-upload-preview {
+    opacity: 0;
+  }
+  .launchpad-create-page .launchpad-upload-spinner {
+    position: absolute;
+    inset: 0;
+    width: 20px;
+    height: 20px;
+    margin: auto;
+    border: 2px solid currentColor;
+    border-right-color: transparent;
+    border-radius: 50%;
+    animation: launchpad-upload-spin 0.8s linear infinite;
+  }
+  @keyframes launchpad-upload-spin {
+    to {
+      transform: rotate(360deg);
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .launchpad-create-page .launchpad-upload-spinner {
+      animation: none;
+      border-right-color: currentColor;
+      opacity: 0.5;
+    }
+  }
+
+  /* Footer: what the launch costs, one line above the button */
+  .launchpad-create-page .launchpad-total {
+    color: var(--text-primary);
+    font-size: 13px;
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* Test-asset mint link in the Developer buy meta row */
+  .launchpad-create-page .launchpad-buy-meta .convert-max {
+    border-radius: 2px;
+  }
+  /* Phones: tighter panel padding */
+  @media (max-width: 720px) {
+    html[data-theme] .launchpad-create-page :is(.launchpad-create-form, .launchpad-preview-panel) {
+      padding: 16px;
+    }
+  }
+}

@@ -1,0 +1,13 @@
+/* The configuration error screen: the route error panel, plus the list of variables to fix. */
+@layer components {
+  .config-error-list {
+    display: grid;
+    gap: 6px;
+    margin: 0;
+    padding-left: 20px;
+    color: var(--text-primary);
+    font-family: var(--font-mono, monospace);
+    font-size: 13px;
+    line-height: 1.5;
+  }
+}

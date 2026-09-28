@@ -1,0 +1,18 @@
+# Read in place of any .dockerignore at the root, because this Dockerfile builds with the
+# repository root as its context. The indexer needs the root lockfile and workspace file,
+# and its own folder; nothing else is sent.
+*
+!package.json
+!pnpm-lock.yaml
+!pnpm-workspace.yaml
+!apps/indexer/
+apps/indexer/node_modules/
+apps/indexer/.ponder/
+apps/indexer/generated/
+apps/indexer/.turbo/
+apps/indexer/.env
+apps/indexer/.env.*
+apps/indexer/test/
+apps/indexer/scripts/
+apps/indexer/Dockerfile*
+apps/indexer/docker-compose.yml

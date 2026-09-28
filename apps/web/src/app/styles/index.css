@@ -1,0 +1,13 @@
+/*
+ * Tailwind theme + utilities. Preflight is intentionally omitted: the pons design
+ * stylesheet ships its own base styles, and a second reset would shift the layout.
+ * The design CSS lives in the components layer so Tailwind utilities can still override it.
+ */
+@layer theme, base, components, utilities;
+@import 'tailwindcss/theme.css' layer(theme);
+@import 'tailwindcss/utilities.css' layer(utilities);
+@import './pons.css' layer(components);
+@import './overrides.css' layer(components);
+@import './matrix.css' layer(components);
+@import './chrome-terminal.css' layer(components);
+@import './terminal-shell.css' layer(components);

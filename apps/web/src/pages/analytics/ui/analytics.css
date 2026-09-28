@@ -1,0 +1,147 @@
+/*
+ * Analytics on the launchpad's rules: flat square panels at the launchpad width,
+ * stats as bordered cells, grey chart bars with only the latest day in green.
+ */
+
+/* Same cascade layer as the global design CSS, so Tailwind utilities still win. */
+@layer components {
+  .analytics-page-shell {
+    width: min(100%, 1080px);
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  /* Panels: same as the Explore panel */
+  .analytics-page-shell :is(.analytics-overview, .analytics-chart-card) {
+    gap: 22px;
+    padding: 24px;
+    border: 1px solid var(--term-line);
+    border-radius: 2px;
+    background: var(--bg-white);
+    box-shadow: none;
+  }
+  .analytics-hero h1 {
+    font-size: 24px;
+  }
+  .analytics-updated {
+    margin-top: 8px;
+    color: var(--text-subtle);
+  }
+
+  /* Range switch: outlined group, white block for the selected range */
+  .analytics-page-shell .analytics-range-tabs {
+    padding: 2px;
+    border: 1px solid var(--term-line);
+    border-radius: 2px;
+    background: none;
+    box-shadow: none;
+  }
+  .analytics-page-shell .analytics-range-tabs button {
+    border-radius: 2px;
+  }
+  html[data-theme='dark'] .analytics-page-shell .analytics-range-tabs button.is-active {
+    background: var(--text-primary);
+    color: var(--bg-page);
+  }
+
+  /* Stats: separate bordered cells, like token cards */
+  .analytics-page-shell .analytics-stats {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 12px;
+    border: 0;
+    border-radius: 0;
+    background: none;
+    box-shadow: none;
+    overflow: visible;
+  }
+  .analytics-page-shell .analytics-stats.analytics-dune-stats > div {
+    gap: 8px;
+    min-height: 0;
+    padding: 16px;
+    border: 1px solid var(--term-line);
+    background: transparent;
+  }
+  .analytics-page-shell .analytics-stats strong {
+    font-size: 32px;
+  }
+  .analytics-page-shell .analytics-stats > div > small {
+    color: var(--text-subtle);
+  }
+
+  /* Charts: no inner panel, square grey bars, the latest day in green */
+  .analytics-page-shell .analytics-chart-grid {
+    gap: 16px;
+  }
+  .analytics-page-shell .analytics-chart-stage {
+    min-height: 0;
+    border-radius: 0;
+    background: none;
+  }
+  .analytics-page-shell .analytics-chart-axis {
+    left: 0;
+    right: 0;
+    color: var(--text-subtle);
+  }
+  .analytics-page-shell .analytics-chart-bars rect {
+    fill: var(--chart-future);
+    opacity: 1;
+    filter: none;
+  }
+  .analytics-page-shell .analytics-chart-bars rect:is(:hover, :focus-visible) {
+    fill: var(--text-muted);
+    filter: none;
+  }
+  .analytics-page-shell .analytics-chart-bars rect.is-active {
+    fill: var(--accent);
+    filter: none;
+  }
+
+  /* A day with no figure: a short dashed stub, so it reads as missing rather than zero */
+  .analytics-page-shell .analytics-chart-bars rect.is-missing {
+    fill: none;
+    stroke: var(--text-subtle);
+    stroke-dasharray: 3 3;
+    vector-effect: non-scaling-stroke;
+  }
+
+  /* The figures did not load: the message and a retry in place of the stats */
+  .analytics-error {
+    display: grid;
+    justify-items: start;
+    gap: 12px;
+    padding: 16px;
+    border: 1px solid var(--term-line);
+  }
+  .analytics-error p {
+    margin: 0;
+    color: var(--text-muted);
+  }
+
+  /* One footnote under everything */
+  .analytics-page-shell .analytics-legal-note {
+    max-width: 72ch;
+    margin: 0;
+    color: var(--text-subtle);
+  }
+
+  @media (max-width: 900px) {
+    .analytics-page-shell .analytics-stats {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+  @media (max-width: 520px) {
+    .analytics-page-shell .analytics-stats {
+      grid-template-columns: minmax(0, 1fr);
+    }
+  }
+
+  /* Phones: tighter panels, smaller figures */
+  @media (max-width: 720px) {
+    .analytics-page-shell :is(.analytics-overview, .analytics-chart-card) {
+      gap: 18px;
+      padding: 16px;
+    }
+    .analytics-page-shell .analytics-stats strong {
+      font-size: 26px;
+    }
+  }
+}

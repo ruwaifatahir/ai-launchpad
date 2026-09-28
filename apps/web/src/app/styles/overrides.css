@@ -1,0 +1,23 @@
+/* Adjustments on top of the captured stylesheet. */
+
+/* The live site lazily paints off-screen cards; render them all. */
+.launch-explore-grid > li {
+  content-visibility: visible;
+}
+
+/* Sliding pills are positioned by useSlidingIndicator; ease them between items. */
+.tabs-indicator,
+.page-control-indicator,
+.nav-product-indicator {
+  transition:
+    transform var(--duration-normal) var(--ease-out),
+    width var(--duration-normal) var(--ease-out),
+    height var(--duration-normal) var(--ease-out);
+}
+@media (prefers-reduced-motion: reduce) {
+  .tabs-indicator,
+  .page-control-indicator,
+  .nav-product-indicator {
+    transition: none;
+  }
+}

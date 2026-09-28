@@ -1,0 +1,125 @@
+/*
+ * The Profile on top of the shared terminal look (app/styles/terminal-shell.css): the wallet's
+ * full address as the headline, then its tokens in the same panel and cards as Explore.
+ */
+
+/* Same cascade layer as the global design CSS, so Tailwind utilities still win. */
+@layer components {
+  .profile-shell {
+    display: grid;
+    gap: 16px;
+    max-width: 1080px;
+  }
+
+  /* Identity: the address is the page's name, so it is shown whole */
+  .profile-head {
+    display: grid;
+    justify-items: start;
+    gap: 6px;
+    padding: 4px 0 8px;
+  }
+  .profile-address {
+    margin: 0;
+    color: var(--text-primary);
+    font-size: 24px;
+    font-weight: 400;
+    letter-spacing: var(--tracking);
+    font-variant-numeric: tabular-nums;
+    overflow-wrap: anywhere;
+  }
+  .profile-count {
+    margin: 0;
+    color: var(--text-muted);
+    font-size: 13px;
+    font-variant-numeric: tabular-nums;
+  }
+  .profile-links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 8px;
+  }
+
+  /* Copy and Explorer: secondary buttons */
+  :is(.profile-link, .profile-create-link) {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    min-height: 32px;
+    padding: 6px 12px;
+    border: 1px solid var(--term-line);
+    border-radius: 2px;
+    background: var(--bg-white);
+    color: var(--text-primary);
+    font: inherit;
+    font-size: 12px;
+    font-variant-numeric: tabular-nums;
+    text-decoration: none;
+    cursor: pointer;
+    transition: background var(--duration-fast) var(--ease-out);
+  }
+  :is(.profile-link, .profile-create-link):hover {
+    background: var(--accent-soft);
+  }
+  :is(.profile-link, .profile-create-link):focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+  }
+  .profile-link .ui-icon {
+    flex: 0 0 auto;
+    color: var(--text-muted);
+  }
+  /* Copied: the check turns white; green stays for action and progress */
+  .profile-link.is-copied .ui-icon {
+    color: var(--text-primary);
+  }
+  .profile-create-link {
+    font-size: 13px;
+  }
+
+  /* The list's description is one line here, with no room kept for a second */
+  .profile-shell .launch-explore-copy {
+    min-height: 0;
+    max-width: none;
+  }
+
+  /* Not an address, or no wallet: one quiet panel in place of the page */
+  .profile-status {
+    justify-items: start;
+    gap: 12px;
+  }
+  .profile-status h1 {
+    margin: 0;
+    font-size: 19px;
+    font-weight: 400;
+    letter-spacing: var(--tracking);
+  }
+  .profile-status p {
+    max-width: 72ch;
+    margin: 0;
+    color: var(--text-muted);
+    font-size: 14px;
+    line-height: 1.5;
+  }
+  .profile-status a {
+    color: var(--text-primary);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+  .profile-status-action {
+    width: min(100%, 280px);
+  }
+  /* Connect: the header's square button, not the pill */
+  .profile-status .ui-btn {
+    min-height: 44px;
+    padding: 10px 16px;
+    border-radius: 2px;
+    font-size: 15px;
+  }
+
+  @media (max-width: 720px) {
+    .profile-address {
+      font-size: 18px;
+    }
+  }
+}

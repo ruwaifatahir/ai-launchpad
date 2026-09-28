@@ -1,0 +1,11 @@
+dist
+node_modules
+package-lock.json
+# Captured design stylesheet: one rule per line on purpose, keep it diffable against the source site.
+src/app/styles/pons.css
+
+# Vendored agent skills and local scratch files
+.agents
+.claude
+.snapshots
+skills-lock.json

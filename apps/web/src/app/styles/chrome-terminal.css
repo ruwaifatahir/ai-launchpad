@@ -1,0 +1,128 @@
+/*
+ * Nav and footer to match the launchpad grid: a flat bar with plain text tabs,
+ * and a footer whose columns sit on the same 5-column grid as the token cards.
+ */
+
+/* ---- Nav ---- */
+
+.nav-bar {
+  height: 100%;
+  background: color-mix(in srgb, var(--bg-page) 92%, transparent);
+  backdrop-filter: blur(8px);
+  border-bottom: 1px solid var(--term-line);
+}
+.nav-inner {
+  max-width: calc(1080px + 48px);
+}
+
+.nav-product-links {
+  gap: 8px;
+  padding: 0;
+  border-radius: 0;
+  background: none;
+}
+html[data-theme='dark'] .nav-product-links {
+  background: none;
+}
+.nav-product-indicator {
+  display: none;
+}
+.nav-product-link {
+  padding: 8px 8px;
+  border-radius: 0;
+  font-size: 14px;
+}
+.nav-product-link.is-active {
+  color: var(--text-primary);
+}
+
+.nav-connect {
+  border-radius: 2px;
+}
+
+/* ---- Footer: columns sit on the same 5-column grid as the token cards ---- */
+
+.footer-reveal {
+  margin-top: 64px;
+  padding-top: 0;
+  border-top: 1px solid var(--term-line);
+}
+.footer-stage {
+  max-width: calc(1080px + 48px);
+  padding-bottom: 24px;
+}
+.footer-card,
+.footer-card-inner {
+  gap: 0;
+}
+.footer-card {
+  padding: 48px 0 0;
+}
+@media (min-width: 768px) {
+  .footer-card {
+    padding: 48px 0 0;
+  }
+}
+
+.footer-grid {
+  gap: 32px 24px;
+  padding-bottom: 40px;
+}
+@media (min-width: 760px) {
+  .footer-grid {
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: 24px;
+  }
+  .footer-brand-col {
+    grid-column: span 2;
+  }
+}
+
+.footer-brand-name {
+  font-size: 20px;
+}
+.footer-brand-col .footer-logo-link,
+.footer-link-heading {
+  min-height: 0;
+}
+.footer-link-heading {
+  font-size: 12px;
+}
+.footer-link:hover {
+  color: var(--text-primary);
+}
+/* Placeholder links go nowhere yet, so they do not light up like the ones that do */
+.footer-link.is-placeholder {
+  cursor: default;
+}
+.footer-link.is-placeholder:hover {
+  color: inherit;
+}
+
+.footer-card-bottom {
+  border-top-color: var(--term-line);
+  align-items: flex-start;
+  flex-wrap: nowrap;
+  padding-top: 20px;
+}
+.footer-fineprint {
+  max-width: 72ch;
+  margin: 0;
+  color: var(--text-subtle);
+  font-size: 11px;
+  line-height: 1.6;
+}
+.footer-copy {
+  flex-shrink: 0;
+  font-size: 11px;
+  line-height: 1.6;
+}
+@media (max-width: 759px) {
+  .footer-card-bottom {
+    flex-direction: column;
+  }
+}
+
+.nav-logo {
+  border-radius: 2px;
+}

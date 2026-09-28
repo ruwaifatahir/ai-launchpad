@@ -1,0 +1,19 @@
+# Read in place of any .dockerignore at the root, because this Dockerfile builds with the
+# repository root as its context. The API needs the root lockfile and workspace file,
+# and its own folder; nothing else is sent.
+*
+!package.json
+!pnpm-lock.yaml
+!pnpm-workspace.yaml
+!apps/api/
+apps/api/node_modules/
+apps/api/dist/
+apps/api/coverage/
+apps/api/.turbo/
+apps/api/openapi.json
+apps/api/.env
+apps/api/.env.*
+apps/api/test/
+apps/api/*.log
+apps/api/Dockerfile*
+apps/api/docker-compose.yml

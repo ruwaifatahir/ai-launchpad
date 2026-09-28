@@ -1,0 +1,22 @@
+export { Icon, type IconProps } from './Icon';
+export {
+  AlertIcon,
+  ArrowUpRightIcon,
+  CheckIcon,
+  ChevronDownIcon,
+  ChevronLeftIcon,
+  ChevronRightIcon,
+  CloseIcon,
+  CoinsIcon,
+  CopyIcon,
+  GasStationIcon,
+  GlobeIcon,
+  ImageIcon,
+  PlusIcon,
+  SearchIcon,
+  SunIcon,
+  SwapIcon,
+  UserIcon,
+  UsersIcon,
+  WalletIcon,
+} from './icons';

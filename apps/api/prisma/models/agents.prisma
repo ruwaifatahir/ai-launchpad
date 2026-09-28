@@ -1,0 +1,59 @@
+/// The autonomous poster that belongs to a token. Exactly one per token, keyed by
+/// the token address, so a client needs no second identifier to reach it.
+///
+/// The row is created lazily by the first write. Every token has an agent as a
+/// matter of domain, so a token with no row is not a token without an agent: a
+/// read answers with the empty shape and never creates the row.
+///
+/// There is no unlock column. Graduation is the token's pool opening, read from the
+/// indexer on demand, so nothing here records it.
+model Agent {
+  /// The token this agent belongs to, always lowercased, so the key is a real
+  /// uniqueness guarantee rather than an accident of checksum casing.
+  token String @id
+
+  /// The four persona parts. Each is written and cleared on its own, and the
+  /// persona counts as written only when all four are present. Never an empty
+  /// string: the request schema trims and rejects blanks before this column.
+  name        String?
+  personality String?
+  lore        String?
+  style       String?
+
+  /// What the creator has said the agent talks about, at most ten entries and
+  /// empty until they say. The request schema is what holds the count, not a
+  /// check constraint, so a write outside this API can still break it.
+  topics String[] @default([])
+
+  /// Posts a day, held between 1 and 5 by the request schema. A token with no row
+  /// reads back this same default, so the number never changes under a creator on
+  /// their first write.
+  pace Int @default(1)
+
+  /// When this agent's next post is due, in UTC like every other day here. It is
+  /// the whole schedule: no separate table, no cursor and no calendar. It sits
+  /// beside the pace that produces it, because when an agent next speaks is a
+  /// property of the agent in the same way its pace is.
+  ///
+  /// Null means never scheduled, which reads as due now, so a creator who finishes
+  /// their attestation sees their agent speak within the minute. A time behind by
+  /// more than one window is a missed slot, which is dropped rather than made up.
+  ///
+  /// The tick advances it conditionally on the value it read, so that single write
+  /// is both the claim and the reschedule and two workers cannot claim one slot.
+  nextPostAt DateTime?
+
+  /// When the creator silenced the agent. Cleared when they start it again.
+  pausedAt DateTime?
+
+  /// When an AI Launchpad admin stopped the agent. Never cleared: the creator cannot
+  /// undo it.
+  stoppedAt DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  /// Serves the due query, which the tick runs every minute.
+  @@index([nextPostAt])
+  @@map("agents")
+}

@@ -1,0 +1,16 @@
+@layer components {
+  .progress-bar {
+    display: block;
+    height: 8px;
+    overflow: hidden;
+    background: var(--progress-track, color-mix(in srgb, var(--text-primary) 15%, transparent));
+  }
+  .progress-bar-fill {
+    display: block;
+    height: 100%;
+    background: var(--progress-fill, var(--accent));
+  }
+  .progress-bar-fill.is-started {
+    min-width: 2px;
+  }
+}

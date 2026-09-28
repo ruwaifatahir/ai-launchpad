@@ -1,0 +1,28 @@
+/* Busy state: a spinner ahead of the label, on top of the captured load bar. */
+@layer components {
+  .ui-btn.is-busy .ui-btn-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .ui-btn-spinner {
+    width: 16px;
+    height: 16px;
+    flex: none;
+    border: 2px solid currentColor;
+    border-right-color: transparent;
+    border-radius: 50%;
+    animation: ui-btn-spin 0.7s linear infinite;
+  }
+  @keyframes ui-btn-spin {
+    to {
+      transform: rotate(360deg);
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .ui-btn-spinner,
+    .ui-btn-loadbar::after {
+      animation-duration: 2.4s;
+    }
+  }
+}

@@ -1,0 +1,76 @@
+/// One attempt by an agent to publish, and how it ended. A row exists before
+/// anything reaches X, so a post here is the attempt and its outcome rather than
+/// only the text that went out.
+///
+/// The row is written unresolved before the X call and resolved after it. That
+/// ordering is what makes an attempt at most once: X publishes no idempotency key
+/// for creating a post, so a row left unresolved by a crash is never picked up
+/// again and the slot behind it is gone.
+///
+/// Nothing deletes a row. X obliges an app to delete content within 24 hours of a
+/// request and everything within ten business days if API access ends. AI Launchpad
+/// keeps its rows regardless, and that is a decision rather than an oversight.
+model Post {
+  /// Row identity, because one token holds many of these. A version 7 UUID, which
+  /// is ordered by creation time, so new rows append to the index rather than
+  /// landing at random through it.
+  id String @id @default(uuid(7))
+
+  /// The token whose agent wrote it, always lowercased, as the agents table
+  /// already is. Indexed and never unique: many rows for one token is the point.
+  token String
+
+  /// What the agent wrote. Kept whatever the outcome, because a row that failed is
+  /// the only record of what was nearly published in the creator's name.
+  text String
+
+  /// Where the attempt stands. A row that reached X is born unresolved and moves
+  /// once, to published or to failed, and never back. A row that was never sent is
+  /// born dry and never moves at all.
+  outcome PostOutcome
+
+  /// Why a failed row failed. Null on every other outcome.
+  reason String?
+
+  /// The post's identifier at X, set once on success. It and the publish log are
+  /// the only handle an admin has on what an agent actually said.
+  xPostId String?
+
+  /// What X charged and what the model charged, as charged at the time rather than
+  /// as a constant read back at query time. X already changed its pricing once this
+  /// year, and a constant in code would silently rewrite the cost of every post
+  /// made before the change.
+  ///
+  /// Scale is eight places because a post costs around $0.0004 and a scale of two
+  /// records every one of them as zero. Both sit at zero until something is
+  /// charged, so an attempt that never reached X carries no figure it did not incur.
+  xCost      Decimal @default(0) @db.Decimal(18, 8)
+  writerCost Decimal @default(0) @db.Decimal(18, 8)
+
+  /// What the writer consumed and produced. They sit beside the money because a
+  /// derived figure with nothing behind it cannot be checked when a bill looks
+  /// wrong.
+  inputTokens  Int @default(0)
+  outputTokens Int @default(0)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  /// Serves the read of what a token's agent already said, published or dry, which
+  /// orders by createdAt descending.
+  @@index([token, createdAt])
+  @@map("posts")
+}
+
+/// How an attempt ended. Unresolved is the state a row is born in, and the state a
+/// crash between the write and X's answer leaves behind for good.
+///
+/// Dry is the one outcome a row is born in rather than moved to. X was never
+/// called, so there is no answer to wait for and nothing to resolve, and it is
+/// never counted among the rows the cost of the product is read from.
+enum PostOutcome {
+  unresolved
+  published
+  failed
+  dry
+}

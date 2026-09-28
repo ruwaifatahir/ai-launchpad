@@ -1,0 +1,75 @@
+/*
+ * Matrix theme. One rule: everything is neutral grey, and green only means
+ * "action" or "progress" (the Connect button, progress fills, focus rings).
+ * Amber (--warning) marks what needs attention, like the Wrong network.
+ * Only overrides the dark theme tokens from pons.css, so the light theme is untouched.
+ */
+
+:root {
+  --term-line: var(--divider);
+  /* Needs attention, e.g. the Wrong network; never an action */
+  --warning: #b26b00;
+}
+
+html[data-theme='dark'] {
+  /* Surfaces: page, panel, raised */
+  --bg-page: #0a0a0a;
+  --bg-white: #111111;
+  --bg-elevated: #171717;
+  --bg-cream: var(--bg-white);
+  --panel-blue: var(--bg-elevated);
+
+  /* Ink */
+  --text-primary: #ededed;
+  --text-muted: #a0a0a0;
+  --text-subtle: #7a7a7a;
+
+  /* One line colour for every border */
+  --divider: #ffffff17;
+
+  /* Neutral interaction washes */
+  --accent-soft: #ffffff0a;
+  --accent-mid: #ffffff14;
+  --accent-blue: var(--text-primary);
+  --accent-blue-soft: var(--accent-soft);
+  --buy: #1c1c1c;
+  --sell: #262626;
+
+  /* The only green */
+  --accent: #00ff41;
+  --accent-hover: #5cff7f;
+  --accent-contrast: #001a07;
+  --accent-green: var(--accent);
+  --success: var(--accent);
+  --warning: #ffb020;
+  --live-dot: var(--accent);
+  --field-focus-border: var(--accent);
+  --field-focus-glow: none;
+  --chart-line: var(--accent);
+  --chart-line-soft: #00ff4133;
+  --chart-grid: var(--divider);
+  --chart-axis: var(--text-subtle);
+  --chart-future: #ffffff33;
+  --chart-stage: #ffffff05;
+
+  /* Flat: no glows, shadows or glass sheen */
+  --btn-glow: none;
+  --shadow-soft: none;
+  --shadow-card: none;
+  --float-shadow: none;
+  --glass-highlight: none;
+  --float-bg: #111111e6;
+  --float-border: var(--divider);
+  --glass-fill: #111111e6;
+  --glass-border: var(--divider);
+  --lg-tint: #0a0a0acc;
+  --lg-rim-border: var(--divider);
+  --banner-bg: var(--bg-page);
+  --banner-fg: var(--text-primary);
+  --banner-muted: var(--text-muted);
+
+  --font-sans: 'Space Grotesk', system-ui, sans-serif;
+  --font-mono: ui-monospace, 'Cascadia Mono', Consolas, monospace;
+  --font-serif: var(--font-sans);
+  --tracking: -0.01em;
+}

@@ -1,0 +1,33 @@
+{
+  "recordedFrom": {
+    "rpc": "https://rpc.mainnet.chain.robinhood.com",
+    "blockNumber": "72931305"
+  },
+  "token": "0x21c18980e4E058a65C8B188A52641Ab8450640a8",
+  "curve": "0x5Cf5efa6BCaE7BaB741CceeBF7780A3E6687D958",
+  "phantomQuote": "166402922642516675534876",
+  "launchSupply": "1000000000000000000000000000",
+  "expected": {
+    "realQuoteReserve": "0",
+    "tokenReserve": "1000000000000000000000000000"
+  },
+  "logs": [
+    {
+      "address": "0x5cf5efa6bcae7bab741cceebf7780a3e6687d958",
+      "topics": ["0x908408e307fc569b417f6cbec5d5a06f44a0a505ac0479b47d421a4b2fd6a1e6"],
+      "data": "0x00000000000000000000000021c18980e4e058a65c8b188a52641ab8450640a8",
+      "logIndex": 1,
+      "blockNumber": "72826007"
+    },
+    {
+      "address": "0x5cf5efa6bcae7bab741cceebf7780a3e6687d958",
+      "topics": [
+        "0xe4b7e48fbd47c2f602bacadee76ad33b16542ddb4997cfc0de04c311adcfa8c7",
+        "0x000000000000000000000000d81e07e124e20a1d81b4a2cf4d4ab1878d4965e1"
+      ],
+      "data": "0x",
+      "logIndex": 2,
+      "blockNumber": "72826007"
+    }
+  ]
+}

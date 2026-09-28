@@ -1,0 +1,30 @@
+# Local Postgres for the indexer, on port 5435 (POSTGRES_PORT) to stay clear of any
+# Postgres already on 5432. The search indexes need pg_trgm, which Ponder does not
+# create, so a new volume creates it on first start.
+services:
+  postgres:
+    image: postgres:17-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: indexer
+    ports:
+      - "${POSTGRES_PORT:-5435}:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    configs:
+      - source: pg-trgm
+        target: /docker-entrypoint-initdb.d/pg-trgm.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+configs:
+  pg-trgm:
+    content: CREATE EXTENSION IF NOT EXISTS pg_trgm;
+
+volumes:
+  postgres-data:

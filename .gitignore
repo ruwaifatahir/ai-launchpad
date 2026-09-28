@@ -1,0 +1,19 @@
+node_modules/
+.turbo/
+dist/
+coverage/
+*.log
+*.tsbuildinfo
+.DS_Store
+
+.env
+.env.*
+!.env.example
+!.env.test
+
+# Private working notes live in their own repository.
+/.private/
+
+# Agent skills are restored from skills-lock.json with `npx skills install`.
+/.agents/
+/.claude/

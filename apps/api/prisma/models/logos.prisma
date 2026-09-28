@@ -1,0 +1,32 @@
+/// One logo upload: which wallet sent it, which stored file it became, and when.
+/// A record of uploads rather than of logos, because a logo is found by its bytes
+/// and two wallets that send the same file get the same logo. Each still leaves
+/// a row, so an admin removing an abusive logo can tell every wallet that sent it.
+///
+/// Nothing here says which token uses a logo. Uploading happens before the launch,
+/// which may never come, so an unused logo is expected and is left where it is.
+///
+/// Rows are never deleted. A logo's address is written on chain at launch and can
+/// never change, so the record of who uploaded it is worth keeping as long as the
+/// address is.
+model LogoUpload {
+  id String @id @default(cuid())
+
+  /// The wallet whose session sent the upload, checksummed as the session holds it.
+  wallet String
+
+  /// The SHA-256 of the stored WebP, in hex, which the address is named after. The
+  /// stored bytes rather than the file sent, because the same file sent twice is what
+  /// makes the same logo, and the stored bytes are what the address serves.
+  hash String
+
+  /// Where the logo is served from, which is what the launch writes on chain. Follows
+  /// from the hash, so every row with one hash holds one address.
+  url String
+
+  createdAt DateTime @default(now())
+
+  /// Serves the check that finds an already stored logo before storing it again.
+  @@index([hash])
+  @@map("logo_uploads")
+}
