@@ -9,6 +9,8 @@ An open source token launchpad for any EVM chain with Uniswap v4.
 
 </div>
 
+https://github.com/user-attachments/assets/4d0fe05c-4769-4043-93a2-807d67e145d0
+
 ![Explore tokens](docs/screenshots/explore.jpg)
 
 | Trade a token | Launch a token |
