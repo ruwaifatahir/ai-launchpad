@@ -17,3 +17,7 @@ coverage/
 # Agent skills are restored from skills-lock.json with `npx skills install`.
 /.agents/
 /.claude/
+
+# Launch videos made by the /brag skills, including timestamped re-runs.
+/brag-output/
+/brag-output-*/
