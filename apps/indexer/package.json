@@ -18,7 +18,7 @@
   "dependencies": {
     "hono": "^4.5.0",
     "ponder": "^0.17.11",
-    "viem": "2.35.0"
+    "viem": "2.56.9"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
